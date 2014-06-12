@@ -98,13 +98,13 @@
 
 <p>In linear regression we attempt to express our independent variable (in this case, housing price), as a linear combination of the dependent variables (bathrooms and square footage) plus some constant.</p>
 
-<pre><code>    f(x,y) = ax + by + c
-</code></pre>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>f(x,y) = ax + by + c</span></code></pre></td></tr></table></div></figure>
+
 
 <p>The difference between what our equation predicts the home price to be and the actual price the home sold for is the error. In order to determine the values of a, b, and c that make the most sense, we choose the values that minimize the average squared error. If the data can be expressed as an invertible matrix, there is an easy formula to get the right values:</p>
 
-<pre><code>    w = (X&lt;sup&gt;T&lt;/sup&gt;X)&lt;sup&gt;-1&lt;/sup&gt;X&lt;sup&gt;T&lt;/sup&gt;b 
-</code></pre>
+<h4><strong>w = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>b</strong></h4>
 
 <p>where w is the matrix containing the coefficients a, b, and c, X represents the dependent variable matrix, and b represents the independent variable matrix.</p>
 
@@ -112,21 +112,19 @@
 
 <p> Matrices can be instantiated in a variety of different ways. I chose a straightforward way of simply listing out the rows as nested arrays.</p>
 
-<p> &#8220;`ruby
- require &lsquo;matrix&rsquo;</p>
-
-<pre><code>housing_data = Matrix[[1,4000,3], [1,3000,2], [1,3800,3], [1,3200,2], [1,3542,4], [1,2348,2],[1,2987,3],[1,4300,4],[1,3342,4],[1,3000,3]]
-
-puts housing_data
-</code></pre>
-
-<p>returns:</p>
-
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>
-</span><span class='line'>```ruby
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>require 'matrix'
+</span><span class='line'>
+</span><span class='line'>housing_data = Matrix[[1,4000,3], [1,3000,2], [1,3800,3], [1,3200,2], [1,3542,4], [1,2348,2],[1,2987,3],[1,4300,4],[1,3342,4],[1,3000,3]]
+</span><span class='line'>
+</span><span class='line'>puts housing_data
+</span><span class='line'>
 </span><span class='line'>housing_prices = Matrix[[400000],[310000],[375000],[315000],[350000],[250000],[300000],[450000],[360000],[320000]]</span></code></pre></td></tr></table></div></figure>
 
 
@@ -277,10 +275,6 @@ puts housing_data
 <p>Matrix.each reads left to right, then down the rows by default, but you can also specify options, for instance only reading down the diagonal (row index == column index). Since here we only have a simple 1x3 matrix, the default method works just fine. Rather than initializing and returning a new matrix, we can also just use the collect method in place of each to return the new matrix.</p>
 
 <p>And there we have the coefficients in a matrix. As we would expect, both a and b are positive since higher square footage and more bathrooms are both associated with a higher price. In this example, blah blah blah.</p>
-
-<p>And now you know how to use matrices in Ruby!</p>
-
-<p>Test test test test</p>
 </div>
 
 
