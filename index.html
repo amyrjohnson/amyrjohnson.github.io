@@ -206,7 +206,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p> Ruby has a useful function that will transpose a matrix for you, as you can see above.</p>
+<p> So, to get started on our handy equation, let&rsquo;s transpose <code>X</code>, our housing data matrix. Ruby has a useful function that will transpose a matrix for you, as you can see above.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -221,7 +221,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p> The standard operators of <code>*, +, -, /,</code> and <code>**</code> perform the corresponding operations on matrices.</p>
+<p> Next we multiply the trasposed matrix by the original housing data matrix. The standard operators of <code>*, +, -, /,</code> and <code>**</code> perform the corresponding operations on matrices.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -236,7 +236,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>  The inverse method will invert a matrix for you.</p>
+<p>We can invert the resulting matrix using the inverse method.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -251,7 +251,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Those fractions are pretty huge, so let&rsquo;s iterate through the coefficient matrix and change them into integers to get a better idea of what&rsquo;s going on.</p>
+<p>Finally, we can get the coefficients matrix with two more multiplication operations. Those fractions look pretty huge, so let&rsquo;s iterate through the matrix and change them to floating point numbers to get a better idea of what&rsquo;s going on.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -261,7 +261,7 @@
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">w</span><span class="o">.</span><span class="n">collect</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
-</span><span class='line'>  <span class="n">i</span><span class="o">.</span><span class="n">to_f</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">i</span><span class="o">.</span><span class="n">to_f</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </span><span class='line'><span class="k">end</span>
 </span><span class='line'>
 </span><span class='line'><span class="o">=&gt;</span> <span class="no">Matrix</span><span class="o">[[</span><span class="mi">18763</span><span class="o">.</span><span class="mi">36</span><span class="o">]</span><span class="p">,</span>
