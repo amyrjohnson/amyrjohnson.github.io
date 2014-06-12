@@ -92,21 +92,23 @@
   </header>
 
 
-<div class="entry-content"><p>Ruby has a matrix library that can be used to do simple matrix math. Matrices have their own class with instance methods like transpose, rank, and determinant. One relevant use case of the Matrix class would be in implementing linear regression with a least squares cost function</p>
+<div class="entry-content"><p>Ruby has a matrix library that can be used to do simple matrix math. Matrices have their own class with instance methods like transpose, rank, and determinant. One use case of the Matrix class would be in implementing linear regression with a least squares cost function.</p>
 
-<p> For example, say you have some housing data on recently sold homes: the square footage, number of bathrooms, and price. If you wanted to predict price another house might sell for, you could use the Ruby Matrix class to figure it out.</p>
+<p> Say you have some housing data on recently sold homes: the square footage, number of bathrooms, and price. If you wanted to predict price another house might sell for, for example, a 3500 square foot home with 3 bathrooms, you could use the Ruby Matrix class to figure it out.</p>
 
-<p>In linear regression we attempt to express our independent variable (in this case, housing price), as a linear combination of the dependent variables (bathrooms and square footage) plus some constant.</p>
+<p>In linear regression we attempt to express our dependent variable (in this case, housing price), as a linear combination of the independent variables (bathrooms and square footage) plus some constant.</p>
 
 <p><strong><center>f(x,y) = ax + by + c</center></strong></p>
 
-<p>The difference between what our equation predicts the home price to be and the actual price the home sold for is the error. In order to determine the values of a, b, and c that make the most sense, we choose the values that minimize the average squared error. If the data can be expressed as an invertible matrix, there is an easy formula to get the right values:</p>
+<p>For any given triplet of datapoints (square footage, number of bathrooms, and price), the difference between the actual price and the price predicted by our equation, squared is the pointwise error. In order to determine the values of a, b, and c that make the most sense, we choose the values that minimize the total average squared error. If the data can be expressed as an matrix X such that X<sup>T</sup>X is invertible, there is an easy formula to get the right values:</p>
 
 <p><strong><center>w = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>b</center></strong></p>
 
 <p>where w is the matrix containing the coefficients <code>a</code>, <code>b</code>, and <code>c</code>, <code>X</code> represents the dependent variable matrix, and <code>b</code> represents the independent variable matrix.</p>
 
 <p>With the Ruby Matrix library these manipulations will be easy. Creating matrices in Ruby is simple. First add a line to require the Matrix library, and you&rsquo;re ready to get started. Ruby stores each matrix as an array of rows. Just like arrays, the indices of matrix rows and columns start at zero. Don&rsquo;t forget that all the rows must be the same length for the matrix to be valid.</p>
+
+<p>Below is some data I made up about ten sample houses that were sold. Each row represents a house with square footage in column two, the number of bathrooms in column three, and price in the last column.</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -134,7 +136,7 @@
 </span><span class='line'>|  House 9      |3000                    |3                    |320000          |</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Above is some data I made up about ten sample houses that were sold. Each row represents a house with square footage in column two, the number of bathrooms in column three, and price in the last column.</p>
+<p>Here we enter the data from the table into two matrices. Matrices can be instantiated in a variety of ways. I chose to simply list out the rows as nested arrays, and unless specified otherwise that&rsquo;s what ruby assumes the input will be. Each row represents a house with square footage in column 1 (the second column since ruby indexes columns from 0) and the number of bathrooms in column 2. The constant value in column 0 is necessary for the calculation of the constant c from our previous equation. The second matrix contains the housing prices. These two matrices are all we need for our calculations.</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -188,7 +190,7 @@
 </span><span class='line'>                      ]</span></code></pre></td></tr></table></div></figure>
 
 
-<p> Here we enter the data from the table into two matrices. Matrices can be instantiated in a variety of different ways. I chose a straightforward way of simply listing out the rows as nested arrays. Each row represents a house with square footage in column 1 (the second column since ruby indexes columns from 0) and the number of bathrooms in column 2. The constant value in column 0 is necessary for the calculation of the constant c from our previous equation. The second matrix contains the housing prices. These two matrices are all we need for our calculations.</p>
+<p> So, to get started on our handy equation, let&rsquo;s transpose <code>X</code>, our housing data matrix. Ruby has a useful function that will transpose a matrix for you, as you can see above.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -203,7 +205,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p> So, to get started on our handy equation, let&rsquo;s transpose <code>X</code>, our housing data matrix. Ruby has a useful function that will transpose a matrix for you, as you can see above.</p>
+<p> Next we multiply the trasposed matrix by the original housing data matrix. The standard operators of <code>*, +, -, /,</code> and <code>**</code> perform the corresponding operations on matrices.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -218,7 +220,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p> Next we multiply the trasposed matrix by the original housing data matrix. The standard operators of <code>*, +, -, /,</code> and <code>**</code> perform the corresponding operations on matrices.</p>
+<p>We can invert the resulting matrix using the inverse method.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -233,7 +235,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>We can invert the resulting matrix using the inverse method.</p>
+<p>Finally, we can get the coefficients matrix with two more multiplication operations. Those fractions look pretty unwieldy, so let&rsquo;s iterate through the matrix and change them to floating point numbers to get a better idea of what&rsquo;s going on.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -248,7 +250,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Finally, we can get the coefficients matrix with two more multiplication operations. Those fractions look pretty huge, so let&rsquo;s iterate through the matrix and change them to floating point numbers to get a better idea of what&rsquo;s going on.</p>
+<p><code>Matrix.each</code> reads left to right, then down the rows by default, but you can also specify options, for instance only reading down the diagonal (<code>row index == column index</code>). Since here we only have a simple [3x1] matrix, the default method works just fine. Rather than initializing and returning a new matrix, we can also just use the <code>collect</code> method in place of <code>each</code> to return the new matrix automatically.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -267,9 +269,18 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><code>Matrix.each</code> reads left to right, then down the rows by default, but you can also specify options, for instance only reading down the diagonal (<code>row index == column index</code>). Since here we only have a simple [1x3] matrix, the default method works just fine. Rather than initializing and returning a new matrix, we can also just use the <code>collect</code> method in place of <code>each</code> to return the new matrix automatically.</p>
+<p>And there we have the coefficients in a matrix. The constant, c, is in row 0, the square footage coefficient, b, is in row 1, and the bathroom coeffient, a, is in row 2 (note that this mirrors the column structure of the original data matrix). As we would expect, both a and b are positive since higher square footage and more bathrooms are both associated with a higher price. Additionally, the magnitude of the coefficient for square footage (row 1) is much smaller than the one for bathrooms, since square footage is a much bigger number than bathroom count. Let&rsquo;s revisit our original example of a 3500 square foot house with 3 bathrooms and determine the predicted price.</p>
 
-<p>And there we have the coefficients in a matrix. As we would expect, both a and b are positive since higher square footage and more bathrooms are both associated with a higher price. Additionally, the magnitude of the coefficient for square footage (row 1) is much smaller than the one for bathrooms, since square footage is a much bigger number than bathroom count.</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="mi">8243</span><span class="o">.</span><span class="mi">91</span><span class="o">*</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">89</span><span class="o">.</span><span class="mi">35</span><span class="o">*</span><span class="mi">3500</span> <span class="o">+</span> <span class="mi">18763</span><span class="o">.</span><span class="mi">36</span>
+</span><span class='line'>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="mi">356220</span><span class="o">.</span><span class="mi">08999999997</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Our equation predicts that this house would sell for $356,220, which makes sense compared to the other points in our data set.</p>
 
 <p>For more information on using matrices in Ruby checkout the <a href="http://www.ruby-doc.org/stdlib-2.0/libdoc/matrix/rdoc/Matrix.html">Ruby Documentation</a> and this <a href="http://rubylearning.com/blog/2013/04/04/ruby-matrix-the-forgotten-library/">helpful post</a> from RubyLearning Blog.</p>
 </div>
