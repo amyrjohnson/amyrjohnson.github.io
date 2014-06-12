@@ -4,7 +4,7 @@
   <title><![CDATA[Blog Title]]></title>
   <link href="http://amyrjohnson.github.io/atom.xml" rel="self"/>
   <link href="http://amyrjohnson.github.io/"/>
-  <updated>2014-06-12T16:36:07-04:00</updated>
+  <updated>2014-06-12T17:25:22-04:00</updated>
   <id>http://amyrjohnson.github.io/</id>
   <author>
     <name><![CDATA[Amy Johnson]]></name>
@@ -24,19 +24,15 @@
 
 <p>In linear regression we attempt to express our independent variable (in this case, housing price), as a linear combination of the dependent variables (bathrooms and square footage) plus some constant.</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>f(x,y) = ax + by + c</span></code></pre></td></tr></table></div></figure>
-
+<p><strong><center>f(x,y) = ax + by + c</center></strong></p>
 
 <p>The difference between what our equation predicts the home price to be and the actual price the home sold for is the error. In order to determine the values of a, b, and c that make the most sense, we choose the values that minimize the average squared error. If the data can be expressed as an invertible matrix, there is an easy formula to get the right values:</p>
 
-<h4><strong>w = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>b</strong></h4>
+<p><strong><center>w = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>b</center></strong></p>
 
-<p>where w is the matrix containing the coefficients a, b, and c, X represents the dependent variable matrix, and b represents the independent variable matrix.</p>
+<p>where w is the matrix containing the coefficients <code>a</code>, <code>b</code>, and <code>c</code>, <code>X</code> represents the dependent variable matrix, and <code>b</code> represents the independent variable matrix.</p>
 
-<p>With the Ruby Matrix library these manipulations will be easy. Creating matrices in Ruby is simple. First you need to add a line to require the Matrix library, and then you&rsquo;re ready to go. Ruby stores matrices as an array of rows, and all the rows must be the same length. Just like arrays, the indices of matrix rows and columns start at zero.</p>
-
-<p> Matrices can be instantiated in a variety of different ways. I chose a straightforward way of simply listing out the rows as nested arrays.</p>
+<p>With the Ruby Matrix library these manipulations will be easy. Creating matrices in Ruby is simple. First add a line to require the Matrix library, and you&rsquo;re ready to get started. Ruby stores each matrix as an array of rows. Just like arrays, the indices of matrix rows and columns start at zero. Don&rsquo;t forget that all the rows must be the same length for the matrix to be valid.</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -45,108 +41,91 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>| ---- Table -- |  --  Square Footage -- |  -- # Bathrooms --  |  -- Price ---- |
+</span><span class='line'>|:-------------:|:----------------------:|:-------------------:|:--------------:|
+</span><span class='line'>|  House 0      |4000                    |3                    |400000          |
+</span><span class='line'>|  House 1      |3000                    |2                    |310000          |
+</span><span class='line'>|  House 2      |3800                    |3                    |375000          |
+</span><span class='line'>|  House 3      |3200                    |2                    |315000          |
+</span><span class='line'>|  House 4      |3542                    |4                    |350000          |
+</span><span class='line'>|  House 5      |2348                    |2                    |250000          |
+</span><span class='line'>|  House 6      |2987                    |3                    |300000          |
+</span><span class='line'>|  House 7      |4300                    |4                    |450000          |
+</span><span class='line'>|  House 8      |3342                    |4                    |360000          |
+</span><span class='line'>|  House 9      |3000                    |3                    |320000          |</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Above is some data I made up about ten sample houses that were sold. Each row represents a house with square footage in column two, the number of bathrooms in column three, and price in the last column.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>require 'matrix'
 </span><span class='line'>
-</span><span class='line'>housing_data = Matrix[[1,4000,3], [1,3000,2], [1,3800,3], [1,3200,2], [1,3542,4], [1,2348,2],[1,2987,3],[1,4300,4],[1,3342,4],[1,3000,3]]
+</span><span class='line'>housing_data = Matrix[[1,4000,3], 
+</span><span class='line'>                      [1,3000,2], 
+</span><span class='line'>                      [1,3800,3], 
+</span><span class='line'>                      [1,3200,2], 
+</span><span class='line'>                      [1,3542,4], 
+</span><span class='line'>                      [1,2348,2],
+</span><span class='line'>                      [1,2987,3],
+</span><span class='line'>                      [1,4300,4],
+</span><span class='line'>                      [1,3342,4],
+</span><span class='line'>                      [1,3000,3]
+</span><span class='line'>                      ]
 </span><span class='line'>
-</span><span class='line'>puts housing_data
-</span><span class='line'>
-</span><span class='line'>housing_prices = Matrix[[400000],[310000],[375000],[315000],[350000],[250000],[300000],[450000],[360000],[320000]]</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>housing_prices = Matrix[[400000],
+</span><span class='line'>                      [310000],
+</span><span class='line'>                      [375000],
+</span><span class='line'>                      [315000],
+</span><span class='line'>                      [350000],
+</span><span class='line'>                      [250000],
+</span><span class='line'>                      [300000],
+</span><span class='line'>                      [450000],
+</span><span class='line'>                      [360000],
+</span><span class='line'>                      [320000]
+</span><span class='line'>                      ]</span></code></pre></td></tr></table></div></figure>
 
 
-<table>
-<thead>
-<tr>
-<th></th>
-<th> Table  </th>
-<th align="left"> Square Footage </th>
-<th align="left"> # Bathrooms   </th>
-<th align="left"> Price </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td></td>
-<td>        </td>
-<td align="left">4000            </td>
-<td align="left">3              </td>
-<td align="left">400000 |</td>
-</tr>
-<tr>
-<td></td>
-<td>        </td>
-<td align="left">3000            </td>
-<td align="left">2              </td>
-<td align="left">310000 |</td>
-</tr>
-<tr>
-<td></td>
-<td>        </td>
-<td align="left">3800            </td>
-<td align="left">3              </td>
-<td align="left">375000 | </td>
-</tr>
-<tr>
-<td></td>
-<td>        </td>
-<td align="left">3200            </td>
-<td align="left">2              </td>
-<td align="left">315000 |</td>
-</tr>
-<tr>
-<td></td>
-<td>        </td>
-<td align="left">3542            </td>
-<td align="left">4              </td>
-<td align="left">350000 |</td>
-</tr>
-<tr>
-<td></td>
-<td>        </td>
-<td align="left">2348            </td>
-<td align="left">2              </td>
-<td align="left">250000 |</td>
-</tr>
-<tr>
-<td></td>
-<td>        </td>
-<td align="left">2987            </td>
-<td align="left">3              </td>
-<td align="left">300000 |</td>
-</tr>
-<tr>
-<td></td>
-<td>        </td>
-<td align="left">4300            </td>
-<td align="left">4              </td>
-<td align="left">450000 |</td>
-</tr>
-<tr>
-<td></td>
-<td>        </td>
-<td align="left">3342            </td>
-<td align="left">4              </td>
-<td align="left">360000 |</td>
-</tr>
-<tr>
-<td></td>
-<td>        </td>
-<td align="left">3000            </td>
-<td align="left">3              </td>
-<td align="left">320000 |</td>
-</tr>
-</tbody>
-</table>
-
-
-<p>Above is some data I made up. The first matrix contains the housing data. Each row represents a house with square footage in column two and the number of bathrooms in column three. The constant value in column one is necessary for the calculation of the constant c from our previous equation. The second matrix contains the housing prices. These two matrices are all we need for our calculations.</p>
+<p> Here we enter the data from the table into two matrices. Matrices can be instantiated in a variety of different ways. I chose a straightforward way of simply listing out the rows as nested arrays. Each row represents a house with square footage in column 1 (the second column since ruby indexes columns from 0) and the number of bathrooms in column 2. The constant value in column 0 is necessary for the calculation of the constant c from our previous equation. The second matrix contains the housing prices. These two matrices are all we need for our calculations.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">x_t</span> <span class="o">=</span> <span class="n">housing_data</span><span class="o">.</span><span class="n">transpose</span>
 </span><span class='line'>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="no">Matrix</span><span class="o">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="mi">4000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">,</span> <span class="mi">3800</span><span class="p">,</span> <span class="mi">3200</span><span class="p">,</span> <span class="mi">3542</span><span class="p">,</span> <span class="mi">2348</span><span class="p">,</span> <span class="mi">2987</span><span class="p">,</span> <span class="mi">4300</span><span class="p">,</span> <span class="mi">3342</span><span class="p">,</span> <span class="mi">3000</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="o">]]</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="no">Matrix</span><span class="o">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>          <span class="o">[</span><span class="mi">4000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">,</span> <span class="mi">3800</span><span class="p">,</span> <span class="mi">3200</span><span class="p">,</span> <span class="mi">3542</span><span class="p">,</span> <span class="mi">2348</span><span class="p">,</span> <span class="mi">2987</span><span class="p">,</span> <span class="mi">4300</span><span class="p">,</span> <span class="mi">3342</span><span class="p">,</span> <span class="mi">3000</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>          <span class="o">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="o">]]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -155,9 +134,13 @@
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'> <span class="n">x_t_x</span> <span class="o">=</span> <span class="n">x_t</span> <span class="o">*</span> <span class="n">housing_data</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="o">=&gt;</span> <span class="no">Matrix</span><span class="o">[[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">33519</span><span class="p">,</span> <span class="mi">30</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="mi">33519</span><span class="p">,</span> <span class="mi">115320001</span><span class="p">,</span> <span class="mi">103193</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">103193</span><span class="p">,</span> <span class="mi">96</span><span class="o">]]</span>
+</span><span class='line'>  <span class="o">=&gt;</span> <span class="no">Matrix</span><span class="o">[[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">33519</span><span class="p">,</span> <span class="mi">30</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>              <span class="o">[</span><span class="mi">33519</span><span class="p">,</span> <span class="mi">115320001</span><span class="p">,</span> <span class="mi">103193</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>              <span class="o">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">103193</span><span class="p">,</span> <span class="mi">96</span><span class="o">]]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -166,20 +149,28 @@
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'> <span class="n">x_t_x</span><span class="o">.</span><span class="n">inverse</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="o">=&gt;</span> <span class="no">Matrix</span><span class="o">[[</span><span class="p">(</span><span class="mi">421924847</span><span class="o">/</span><span class="mi">108574934</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">61017</span><span class="o">/</span><span class="mi">54287467</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">673863</span><span class="o">/</span><span class="mi">108574934</span><span class="p">)</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="p">(</span><span class="o">-</span><span class="mi">61017</span><span class="o">/</span><span class="mi">54287467</span><span class="p">),</span> <span class="p">(</span><span class="mi">30</span><span class="o">/</span><span class="mi">54287467</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">13180</span><span class="o">/</span><span class="mi">54287467</span><span class="p">)</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="p">(</span><span class="o">-</span><span class="mi">673863</span><span class="o">/</span><span class="mi">108574934</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">13180</span><span class="o">/</span><span class="mi">54287467</span><span class="p">),</span> <span class="p">(</span><span class="mi">29676649</span><span class="o">/</span><span class="mi">108574934</span><span class="p">)</span><span class="o">]]</span>
+</span><span class='line'>  <span class="o">=&gt;</span> <span class="no">Matrix</span><span class="o">[[</span><span class="p">(</span><span class="mi">421924847</span><span class="o">/</span><span class="mi">108574934</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">61017</span><span class="o">/</span><span class="mi">54287467</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">673863</span><span class="o">/</span><span class="mi">108574934</span><span class="p">)</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>            <span class="o">[</span><span class="p">(</span><span class="o">-</span><span class="mi">61017</span><span class="o">/</span><span class="mi">54287467</span><span class="p">),</span> <span class="p">(</span><span class="mi">30</span><span class="o">/</span><span class="mi">54287467</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">13180</span><span class="o">/</span><span class="mi">54287467</span><span class="p">)</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>            <span class="o">[</span><span class="p">(</span><span class="o">-</span><span class="mi">673863</span><span class="o">/</span><span class="mi">108574934</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">13180</span><span class="o">/</span><span class="mi">54287467</span><span class="p">),</span> <span class="p">(</span><span class="mi">29676649</span><span class="o">/</span><span class="mi">108574934</span><span class="p">)</span><span class="o">]]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>  The inverse function will inverse a matrix for you.</p>
+<p>  The inverse method will invert a matrix for you.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">w</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_t_x</span><span class="o">.</span><span class="n">inverse</span> <span class="o">*</span> <span class="n">x_t</span><span class="p">)</span> <span class="o">*</span> <span class="n">housing_prices</span>
 </span><span class='line'>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="no">Matrix</span><span class="o">[[</span><span class="p">(</span><span class="mi">1018615352500</span><span class="o">/</span><span class="mi">54287467</span><span class="p">)</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="p">(</span><span class="mi">4850790000</span><span class="o">/</span><span class="mi">54287467</span><span class="p">)</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="p">(</span><span class="mi">447540942500</span><span class="o">/</span><span class="mi">54287467</span><span class="p">)</span><span class="o">]]</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="no">Matrix</span><span class="o">[[</span><span class="p">(</span><span class="mi">1018615352500</span><span class="o">/</span><span class="mi">54287467</span><span class="p">)</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>          <span class="o">[</span><span class="p">(</span><span class="mi">4850790000</span><span class="o">/</span><span class="mi">54287467</span><span class="p">)</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>          <span class="o">[</span><span class="p">(</span><span class="mi">447540942500</span><span class="o">/</span><span class="mi">54287467</span><span class="p">)</span><span class="o">]]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -190,17 +181,23 @@
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">w</span><span class="o">.</span><span class="n">collect</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
 </span><span class='line'>  <span class="n">i</span><span class="o">.</span><span class="n">to_f</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </span><span class='line'><span class="k">end</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">=&gt;</span> <span class="no">Matrix</span><span class="o">[[</span><span class="mi">18763</span><span class="o">.</span><span class="mi">36</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="mi">89</span><span class="o">.</span><span class="mi">35</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="mi">8243</span><span class="o">.</span><span class="mi">91</span><span class="o">]]</span>
+</span><span class='line'><span class="o">=&gt;</span> <span class="no">Matrix</span><span class="o">[[</span><span class="mi">18763</span><span class="o">.</span><span class="mi">36</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>          <span class="o">[</span><span class="mi">89</span><span class="o">.</span><span class="mi">35</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>          <span class="o">[</span><span class="mi">8243</span><span class="o">.</span><span class="mi">91</span><span class="o">]]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Matrix.each reads left to right, then down the rows by default, but you can also specify options, for instance only reading down the diagonal (row index == column index). Since here we only have a simple 1x3 matrix, the default method works just fine. Rather than initializing and returning a new matrix, we can also just use the collect method in place of each to return the new matrix.</p>
+<p><code>Matrix.each</code> reads left to right, then down the rows by default, but you can also specify options, for instance only reading down the diagonal (<code>row index == column index</code>). Since here we only have a simple [1x3] matrix, the default method works just fine. Rather than initializing and returning a new matrix, we can also just use the <code>collect</code> method in place of <code>each</code> to return the new matrix automatically.</p>
 
-<p>And there we have the coefficients in a matrix. As we would expect, both a and b are positive since higher square footage and more bathrooms are both associated with a higher price. In this example, blah blah blah.</p>
+<p>And there we have the coefficients in a matrix. As we would expect, both a and b are positive since higher square footage and more bathrooms are both associated with a higher price. Additionally, the magnitude of the coefficient for square footage (row 1) is much smaller than the one for bathrooms, since square footage is a much bigger number than bathroom count.</p>
+
+<p>For more information on using matrices in Ruby checkout the <a href="http://www.ruby-doc.org/stdlib-2.0/libdoc/matrix/rdoc/Matrix.html">Ruby Documentation</a> and this <a href="http://rubylearning.com/blog/2013/04/04/ruby-matrix-the-forgotten-library/">helpful post</a> from RubyLearning Blog.</p>
 ]]></content>
   </entry>
   
