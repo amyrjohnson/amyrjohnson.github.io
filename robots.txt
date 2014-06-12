@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://amyrjohnson.github.io/sitemap.xml 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Blog Title]]></title>
+  <link href="http://amyrjohnson.github.io/atom.xml" rel="self"/>
+  <link href="http://amyrjohnson.github.io/"/>
+  <updated>2014-06-12T16:00:03-04:00</updated>
+  <id>http://amyrjohnson.github.io/</id>
+  <author>
+    <name><![CDATA[Amy Johnson]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[My First Post on Octopress]]></title>
+    <link href="http://amyrjohnson.github.io/blog/2014/06/12/my-first-post-on-octopress/"/>
+    <updated>2014-06-12T00:00:00-04:00</updated>
+    <id>http://amyrjohnson.github.io/blog/2014/06/12/my-first-post-on-octopress</id>
+    <content type="html"><![CDATA[<p>&ldquo;Hello, world&rdquo;</p>
+]]></content>
+  </entry>
+  
+</feed>
