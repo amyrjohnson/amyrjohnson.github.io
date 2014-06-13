@@ -4,7 +4,7 @@
   <title><![CDATA[Blog Title]]></title>
   <link href="http://amyrjohnson.github.io/atom.xml" rel="self"/>
   <link href="http://amyrjohnson.github.io/"/>
-  <updated>2014-06-12T19:59:31-04:00</updated>
+  <updated>2014-06-12T21:17:25-04:00</updated>
   <id>http://amyrjohnson.github.io/</id>
   <author>
     <name><![CDATA[Amy Johnson]]></name>
@@ -18,23 +18,7 @@
     <link href="http://amyrjohnson.github.io/blog/2014/06/11/my-first-post-on-octopress/"/>
     <updated>2014-06-11T13:05:08-04:00</updated>
     <id>http://amyrjohnson.github.io/blog/2014/06/11/my-first-post-on-octopress</id>
-    <content type="html"><![CDATA[<p>Ruby has a matrix library that can be used to do simple matrix math. Matrices have their own class with instance methods like transpose, rank, and determinant. One use case of the Matrix class would be in implementing linear regression with a least squares cost function.</p>
-
-<p> Say you have some housing data on recently sold homes: the square footage, number of bathrooms, and price. If you wanted to predict price another house might sell for, for example, a 3500 square foot home with 3 bathrooms, you could use the Ruby Matrix class to figure it out.</p>
-
-<p>In linear regression we attempt to express our dependent variable (in this case, housing price), as a linear combination of the independent variables (bathrooms and square footage) plus some constant.</p>
-
-<p><strong><center>f(x,y) = ax + by + c</center></strong></p>
-
-<p>For any given triplet of datapoints (square footage, number of bathrooms, and price), the difference between the actual price and the price predicted by our equation, squared is the pointwise error. In order to determine the values of a, b, and c that make the most sense, we choose the values that minimize the total average squared error. If the data can be expressed as an matrix X such that X<sup>T</sup>X is invertible, there is an easy formula to get the right values:</p>
-
-<p><strong><center>w = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>b</center></strong></p>
-
-<p>where w is the matrix containing the coefficients <code>a</code>, <code>b</code>, and <code>c</code>, <code>X</code> represents the dependent variable matrix, and <code>b</code> represents the independent variable matrix.</p>
-
-<p>With the Ruby Matrix library these manipulations will be easy. Creating matrices in Ruby is simple. First add a line to require the Matrix library, and you&rsquo;re ready to get started. Ruby stores each matrix as an array of rows. Just like arrays, the indices of matrix rows and columns start at zero. Don&rsquo;t forget that all the rows must be the same length for the matrix to be valid.</p>
-
-<p>Below is some data I made up about ten sample houses that were sold. Each row represents a house with square footage in column two, the number of bathrooms in column three, and price in the last column.</p>
+    <content type="html"><![CDATA[<p>Ruby has a matrix library that can be used to do simple linear algebra. The Matrix class defines useful methods like transpose, rank, and determinant. This is nice, because a lot of practical problems can be formulated in terms of linear algebra. Say that we have the following data about recently sold homes:</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -62,7 +46,21 @@
 </span><span class='line'>|  House 9      |3000                    |3                    |320000          |</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Here we enter the data from the table into two matrices. Matrices can be instantiated in a variety of ways. I chose to simply list out the rows as nested arrays, and unless specified otherwise that&rsquo;s what ruby assumes the input will be. Each row represents a house with square footage in column 1 (the second column since ruby indexes columns from 0) and the number of bathrooms in column 2. The constant value in column 0 is necessary for the calculation of the constant c from our previous equation. The second matrix contains the housing prices. These two matrices are all we need for our calculations.</p>
+<p>The data has, for each house, the square footage, number of bathrooms, and the price that the house sold for. If you wanted to predict what price another house (not in this data set) might sell for, and you knew its size and bathroom count, you could use the Matrix class to perform a linear regression on the data.</p>
+
+<p>In linear regression we attempt to express our dependent variable (in this case, housing price), as a linear combination of the independent variables (bathrooms and square footage) plus some constant.</p>
+
+<p><strong><center>f(x,y) = ax + by + c</center></strong></p>
+
+<p>For any given triplet of datapoints (square footage, number of bathrooms, and price), the difference between the actual price and the price predicted by our equation, squared is the pointwise error. In order to determine the values of a, b, and c that make the most sense, we choose the values that minimize the total average squared error. If the data can be expressed as an matrix X such that X<sup>T</sup>X is invertible, there is an easy formula to get the right values:</p>
+
+<p><strong><center>w = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>b</center></strong></p>
+
+<p>where w is the matrix containing the coefficients <code>a</code>, <code>b</code>, and <code>c</code>, <code>X</code> represents the dependent variable matrix, and <code>b</code> represents the independent variable matrix.</p>
+
+<p>With the Ruby matrix class these manipulations will be easy. Creating matrices in Ruby is simple. First add a line to require the matrix library, and you&rsquo;re ready to get started. Ruby stores each matrix as an array of rows. Just like arrays, the indices of matrix rows and columns start at zero. Don&rsquo;t forget that all the rows must be the same length for the matrix to be valid.</p>
+
+<p>Here we enter the data from the table into two matrices. Matrices can be instantiated in a variety of ways. I chose to simply list out the rows as nested arrays, and unless specified otherwise that&rsquo;s what Ruby assumes the input will be. Each row represents a house with square footage in column 1 (the second column since ruby indexes columns from 0) and the number of bathrooms in column 2. The constant value in column 0 is necessary for the calculation of the constant c from our previous equation. The second matrix contains the housing prices. These two matrices are all we need for our calculations.</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
