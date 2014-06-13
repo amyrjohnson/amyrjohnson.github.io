@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Flatiron&nbsp;School | Blog Title]]></title>
   <link href="http://amyrjohnson.github.io/blog/categories/flatiron-school/atom.xml" rel="self"/>
   <link href="http://amyrjohnson.github.io/"/>
-  <updated>2014-06-12T21:17:25-04:00</updated>
+  <updated>2014-06-13T15:57:32-04:00</updated>
   <id>http://amyrjohnson.github.io/</id>
   <author>
     <name><![CDATA[Amy Johnson]]></name>
@@ -20,20 +20,82 @@
     <id>http://amyrjohnson.github.io/blog/2014/06/11/my-first-post-on-octopress</id>
     <content type="html"><![CDATA[<p>Ruby has a matrix library that can be used to do simple linear algebra. The Matrix class defines useful methods like transpose, rank, and determinant. This is nice, because a lot of practical problems can be formulated in terms of linear algebra. Say that we have the following data about recently sold homes:</p>
 
-<p><code>
-| ---- Table -- |  --  Square Footage -- |  -- # Bathrooms --  |  -- Price ---- |
-|:-------------:|:----------------------:|:-------------------:|:--------------:|
-|  House 0      |4000                    |3                    |400000          |
-|  House 1      |3000                    |2                    |310000          |
-|  House 2      |3800                    |3                    |375000          |
-|  House 3      |3200                    |2                    |315000          |
-|  House 4      |3542                    |4                    |350000          |
-|  House 5      |2348                    |2                    |250000          |
-|  House 6      |2987                    |3                    |300000          |
-|  House 7      |4300                    |4                    |450000          |
-|  House 8      |3342                    |4                    |360000          |
-|  House 9      |3000                    |3                    |320000          |
-</code></p>
+<table>
+<thead>
+<tr>
+<th> Table  </th>
+<th align="left"> Square Footage </th>
+<th align="left"> # Bathrooms   </th>
+<th align="left"> Price </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>House 0 </td>
+<td align="left">4000            </td>
+<td align="left">3              </td>
+<td align="left">400000 </td>
+</tr>
+<tr>
+<td>House 1 </td>
+<td align="left">3000            </td>
+<td align="left">2              </td>
+<td align="left">310000 </td>
+</tr>
+<tr>
+<td>House 2 </td>
+<td align="left">3800            </td>
+<td align="left">3              </td>
+<td align="left">375000  </td>
+</tr>
+<tr>
+<td>House 3 </td>
+<td align="left">3200            </td>
+<td align="left">2              </td>
+<td align="left">315000 </td>
+</tr>
+<tr>
+<td>House 4 </td>
+<td align="left">3542            </td>
+<td align="left">4              </td>
+<td align="left">350000 </td>
+</tr>
+<tr>
+<td>House 5 </td>
+<td align="left">2348            </td>
+<td align="left">2              </td>
+<td align="left">250000 </td>
+</tr>
+<tr>
+<td>House 6 </td>
+<td align="left">2987            </td>
+<td align="left">3              </td>
+<td align="left">300000 </td>
+</tr>
+<tr>
+<td>House 7 </td>
+<td align="left">4300            </td>
+<td align="left">4              </td>
+<td align="left">450000 </td>
+</tr>
+<tr>
+<td>House 8 </td>
+<td align="left">3342            </td>
+<td align="left">4              </td>
+<td align="left">360000 </td>
+</tr>
+<tr>
+<td>House 9 </td>
+<td align="left">3000            </td>
+<td align="left">3              </td>
+<td align="left">320000 </td>
+</tr>
+</tbody>
+</table>
+
+
+<br>
+
 
 <p>The data has, for each house, the square footage, number of bathrooms, and the price that the house sold for. If you wanted to predict what price another house (not in this data set) might sell for, and you knew its size and bathroom count, you could use the Matrix class to perform a linear regression on the data.</p>
 
