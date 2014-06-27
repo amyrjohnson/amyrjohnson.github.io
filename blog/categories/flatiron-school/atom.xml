@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Flatiron&nbsp;School | Blog Title]]></title>
   <link href="http://amyrjohnson.github.io/blog/categories/flatiron-school/atom.xml" rel="self"/>
   <link href="http://amyrjohnson.github.io/"/>
-  <updated>2014-06-27T13:36:51-04:00</updated>
+  <updated>2014-06-27T13:40:10-04:00</updated>
   <id>http://amyrjohnson.github.io/</id>
   <author>
     <name><![CDATA[Amy Johnson]]></name>
@@ -90,7 +90,7 @@ end
 
 <p>Once I&rsquo;ve created views and routes for all my pages I&rsquo;m most of the way there, but how do I get input from the user to allow them to play the game? One simple way to receive input from a user and store it for access later is to use a form in the view.</p>
 
-<p> ```html</p>
+<p>```html</p>
 
 <pre><code>  &lt;form action="/move" method="get"&gt;
     &lt;input type="text" name="move"&gt;
