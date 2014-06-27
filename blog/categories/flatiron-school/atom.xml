@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Flatiron&nbsp;School | Blog Title]]></title>
   <link href="http://amyrjohnson.github.io/blog/categories/flatiron-school/atom.xml" rel="self"/>
   <link href="http://amyrjohnson.github.io/"/>
-  <updated>2014-06-27T16:00:31-04:00</updated>
+  <updated>2014-06-27T16:06:46-04:00</updated>
   <id>http://amyrjohnson.github.io/</id>
   <author>
     <name><![CDATA[Amy Johnson]]></name>
@@ -83,11 +83,9 @@ end
 <p>module TicTacToeProject
   class App &lt; Sinatra::Application</p>
 
-<pre><code>@@game ||= PlayGame.new
-
-#routes
+<pre><code>#routes
 get '/' do
-  @game = @@game
+  @@game = PlayGame.new
   erb :index
 end
 
