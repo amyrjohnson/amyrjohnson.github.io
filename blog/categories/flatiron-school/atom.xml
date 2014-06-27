@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Flatiron&nbsp;School | Blog Title]]></title>
   <link href="http://amyrjohnson.github.io/blog/categories/flatiron-school/atom.xml" rel="self"/>
   <link href="http://amyrjohnson.github.io/"/>
-  <updated>2014-06-27T15:29:12-04:00</updated>
+  <updated>2014-06-27T16:00:31-04:00</updated>
   <id>http://amyrjohnson.github.io/</id>
   <author>
     <name><![CDATA[Amy Johnson]]></name>
@@ -58,7 +58,7 @@ end
   <div class="row center"></p>
 
 <pre><code>&lt;div class="col-md-4"&gt;
-  &lt;h2&gt;&lt;%= game.square(0,0) %&gt;&lt;/h2&gt;
+  &lt;h2&gt;&lt;%= game.square(0,0) %&gt;&lt;/h2&gt; &lt;!-- returns the value in square [0,0] --&gt;
 &lt;/div&gt;
 &lt;div class="col-md-4 v"&gt;
   &lt;h2&gt;&lt;%= game.square(0,1) %&gt;&lt;/h2&gt;
@@ -126,32 +126,7 @@ end
 </code></pre>
 
 <p>```
- We&rsquo;re almost done! Now we can get a move from the player, update the board, and render a page displaying the updated board. However, if you were to run the code as is you&rsquo;d soon discover a problem. Every time the player moves the board will update, but when the player goes to make a second move they&rsquo;ll find their previous move has been erased and the board is blank! The reason for this is that every time the Sinatra application is run it generates a new instance of the class App or something. So every time it runs, it creates a new instance of the PlayGame class.</p>
-
-<p> I fixed this problem using sessions. Storing the instance of the PlayGame class as a session variable allows you to persist it until a new game is started. Instead of having the class variable <code>@@game</code>, the game session is now stored in <code>session[:game]</code>. Sessions are disabled in Sinatra by default, but they can be included just by adding <code>enable:sessions</code> at the top of your file.</p>
-
-<p>```ruby</p>
-
-<h1>app.rb</h1>
-
-<p> enable :sessions</p>
-
-<p> get &lsquo;/&rsquo; do</p>
-
-<pre><code>  session[:game] = PlayGame.new
-  erb :index
-end
-</code></pre>
-
-<p>get &lsquo;/move&rsquo; do</p>
-
-<pre><code>session[:game].play(params["move"])
-@game = session[:game]
-erb :move
-</code></pre>
-
-<p>end
-```</p>
+ We&rsquo;re almost done! Now we can get a move from the player, update the board, and render a page displaying the updated board. However, if you were to run the code using the Shotgun gem you&rsquo;d soon discover a problem. Every time the player moves the board will update, but when the player goes to make a second move they&rsquo;ll find their previous move has been erased and the board is blank! The reason for this is that every time Shotgun rereads the Sinatra application to refresh the content it generates a new instance of the class App. So every time it runs, it creates a new instance of the PlayGame class, making a new game rather than updating an in-progress game. Try using Rackup instead, and the game should work as intended.</p>
 
 <p>And now we have a working game! Fix up the views with twitter bootstrap, and we&rsquo;re all done. You can check out my finished version at <a href="amystictactoegame.herokuapp.com">amystictactoegame.herokuapp.com</a>.</p>
 ]]></content>
