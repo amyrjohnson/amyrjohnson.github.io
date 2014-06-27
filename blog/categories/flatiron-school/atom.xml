@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Flatiron&nbsp;School | Blog Title]]></title>
   <link href="http://amyrjohnson.github.io/blog/categories/flatiron-school/atom.xml" rel="self"/>
   <link href="http://amyrjohnson.github.io/"/>
-  <updated>2014-06-27T13:40:10-04:00</updated>
+  <updated>2014-06-27T15:29:12-04:00</updated>
   <id>http://amyrjohnson.github.io/</id>
   <author>
     <name><![CDATA[Amy Johnson]]></name>
@@ -22,12 +22,15 @@
 
 <p>The first step is creating the code that contains the logic of the game. There are a ton of different ways to do this, and Sinatra doesn&rsquo;t care which way you choose. I decided to make a game class, a board class, and a player class. The game class contains the logic pertaining to turns and the running of the game. The board class stores the gameboard as a 3x3 matrix, updates itself with every turn, and determines when the game has ended in a win, loss, or tie. The player class stores the player attributes like name and marker.</p>
 
-<p>The next step was moving my logic into a Sinatra application. To make things a little easier, I used <a href="https://github.com/ashleygwilliams/ratpack">Ratpack</a>, a Sinatra boilerplate by <a href="http://about.me/ashley_williams">Ashley Williams</a> with activerecord, sqlite, and twitter bootstrap. In the ratpack schema the models live in the lib/ directory.</p>
+<p>The next step is to move the Ruby logic into a Sinatra application. To make things a little easier, I used <a href="https://github.com/ashleygwilliams/ratpack">Ratpack</a>, a Sinatra boilerplate by <a href="http://about.me/ashley_williams">Ashley Williams</a> with activerecord, sqlite, and twitter bootstrap. In the Ratpack schema the models live in the <code>lib</code> directory.</p>
 
-<p>Now we can ignore our logic for a little bit and get our pages set up. First we need to define a class that inherits from Sinatra so that we can use all of Sinatra&rsquo;s functionality in our application. Next I created the routes. Each page that needs a route established by a <code>get</code> statement in order to render.</p>
+<p>Now we can ignore our tic-tac-toe logic for a little bit and get our pages set up. First we need to define a class that inherits from Sinatra so that we can use all of Sinatra&rsquo;s functionality in our application. Next create the routes. Each page needs a route established by a <code>get</code> statement in order to render.</p>
 
-<p>```ruby
-module TicTacToeProject
+<p>```ruby</p>
+
+<h1>app.rb</h1>
+
+<p>module TicTacToeProject
   class App &lt; Sinatra::Application</p>
 
 <pre><code>#routes
@@ -42,9 +45,14 @@ end
 
 <p>```</p>
 
-<p>The <code>erb</code> statements tell Sinatra what to render. In this case that&rsquo;s the erb files from my views folder. In order to make a board show up in the browser, I need to display the squares from my board in my html, which is easy to do using ERB.</p>
+<p>The <code>erb :filename</code> statements are telling Sinatra what to render. In this case that&rsquo;s the erb files from my views folder. In order to make a board show up in the browser, I need to display each square from my board in my html, which is easy to do using erb. I chose to format the board as three rows with three columns each, but you could just as easily use a table or some other method.</p>
 
 <p>```html</p>
+
+<!-- views/play.erb -->
+
+
+
 
 <p><div class="board">
   <div class="row center"></p>
@@ -66,10 +74,13 @@ end
 <p>  </div>
 ```</p>
 
-<p>The only problem is, my view file has no idea what <code>game</code> is. I need to pass the instance of my game class in my route in order for my views to render it. That looks something like this:</p>
+<p>The only problem is, this erb file has no idea what <code>game</code> is. I need to pass the instance of my game class in my route in order for my views to render it. That looks something like this:</p>
 
-<p>```ruby
-module TicTacToeProject
+<p>```ruby</p>
+
+<h1>app.rb</h1>
+
+<p>module TicTacToeProject
   class App &lt; Sinatra::Application</p>
 
 <pre><code>@@game ||= PlayGame.new
@@ -88,9 +99,10 @@ end
 
 <p>```</p>
 
-<p>Once I&rsquo;ve created views and routes for all my pages I&rsquo;m most of the way there, but how do I get input from the user to allow them to play the game? One simple way to receive input from a user and store it for access later is to use a form in the view.</p>
+<p>Once I&rsquo;ve created views and routes for all my pages I&rsquo;m most of the way there, but how do I get input from the user to allow them to play the game? One simple way to receive input from a user and store it for access later is to include a form in the view.</p>
 
-<p>```html</p>
+<p>```html
+<!-- views/play.erb --></p>
 
 <pre><code>  &lt;form action="/move" method="get"&gt;
     &lt;input type="text" name="move"&gt;
@@ -98,11 +110,13 @@ end
   &lt;/form&gt;
 </code></pre>
 
-<p>```html</p>
+<p>```</p>
 
 <p>The text input of the form, which I named &ldquo;move&rdquo;, is stored in Sinatra&rsquo;s params hash automatically. I can access whatever the user typed elsewhere in my program using the <code>params[:move]</code> variable. Now I can update the board with the player&rsquo;s move before loading the erb in my route.</p>
 
 <p>```ruby</p>
+
+<h1>app.rb</h1>
 
 <pre><code>get '/move' do
   @@game.play(params["move"]) #updates the gameboard with the player's chosen move
@@ -114,10 +128,13 @@ end
 <p>```
  We&rsquo;re almost done! Now we can get a move from the player, update the board, and render a page displaying the updated board. However, if you were to run the code as is you&rsquo;d soon discover a problem. Every time the player moves the board will update, but when the player goes to make a second move they&rsquo;ll find their previous move has been erased and the board is blank! The reason for this is that every time the Sinatra application is run it generates a new instance of the class App or something. So every time it runs, it creates a new instance of the PlayGame class.</p>
 
-<p> I fixed this problem using sessions. Storing the instance of the PlayGame class as a session variable allows you to persist it until a new game is started. Instead of having the class variable <code>@@game</code>, the game session is now stored in session[:game].</p>
+<p> I fixed this problem using sessions. Storing the instance of the PlayGame class as a session variable allows you to persist it until a new game is started. Instead of having the class variable <code>@@game</code>, the game session is now stored in <code>session[:game]</code>. Sessions are disabled in Sinatra by default, but they can be included just by adding <code>enable:sessions</code> at the top of your file.</p>
 
-<p> ```ruby
- enable :sessions</p>
+<p>```ruby</p>
+
+<h1>app.rb</h1>
+
+<p> enable :sessions</p>
 
 <p> get &lsquo;/&rsquo; do</p>
 
