@@ -9,7 +9,7 @@
   <meta name="author" content="Amy Johnson">
 
   
-  <meta name="description" content="This paragraph will be some kind of intro The first step is creating the code that contains the logic of the game. There are a ton of different ways &hellip;">
+  <meta name="description" content="This post details how I made a simple tic-tac-toe game using Sinatra. The first step is creating the code that contains the logic of the game. There &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -98,13 +98,13 @@
   </header>
 
 
-  <div class="entry-content"><p>This paragraph will be some kind of intro</p>
+  <div class="entry-content"><p>This post details how I made a simple tic-tac-toe game using Sinatra.</p>
 
-<p>The first step is creating the code that contains the logic of the game. There are a ton of different ways to do this, and Sinatra doesn&rsquo;t care which way you choose. I decided to make a game class, a board class, and a player class. The game class contains the logic pertaining to turns and the running of the game. The board class stores the gameboard as a 3x3 matrix, updates itself with every turn, and determines when the game has ended in a win, loss, or tie. The player class stores the player attributes like name and marker.</p>
+<p>The first step is creating the code that contains the logic of the game. There are a ton of different ways to do this, and Sinatra doesn&rsquo;t care which way you choose. I decided to make a game class, a board class, and a player class. The game class contains the logic pertaining to turns and the running of the game, initialized with an empty board and two players. The board class stores the gameboard as a 3x3 matrix, updates itself with every turn, and determines when the game has ended in a win, loss, or tie. The player class stores the player attributes like name and marker.</p>
 
-<p>The next step is to move the Ruby logic into a Sinatra application. To make things a little easier, I used <a href="https://github.com/ashleygwilliams/ratpack">Ratpack</a>, a Sinatra boilerplate by <a href="http://about.me/ashley_williams">Ashley Williams</a> with activerecord, sqlite, and twitter bootstrap. In the Ratpack schema the models live in the <code>lib</code> directory.</p>
+<p>The next step is to move the Ruby logic into a Sinatra application. To make things a little easier, I used <a href="https://github.com/ashleygwilliams/ratpack">Ratpack</a>, a Sinatra boilerplate by <a href="http://about.me/ashley_williams">Ashley Williams</a> with support for activerecord, sqlite, and twitter bootstrap (even though we won&rsquo;t be using the database functionality for this application). In the Ratpack schema the models live in the <code>lib</code> directory.</p>
 
-<p>Now we can ignore our tic-tac-toe logic for a little bit and get our pages set up. First we need to define a class that inherits from Sinatra so that we can use all of Sinatra&rsquo;s functionality in our application. Next create the routes. Each page needs a route established by a <code>get</code> statement in order to render.</p>
+<p>Now we can ignore our tic-tac-toe logic for a little bit and get our pages set up. First we need to define a class that inherits from Sinatra so that we can use all of Sinatra&rsquo;s functionality in our application. Next create the routes. Each page needs a route in order to render, which we establish here with <code>get</code> statements.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -185,14 +185,16 @@
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
+<span class='line-number'>16</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># app.rb</span>
 </span><span class='line'>
 </span><span class='line'><span class="k">module</span> <span class="nn">TicTacToeProject</span>
 </span><span class='line'>  <span class="k">class</span> <span class="nc">App</span> <span class="o">&lt;</span> <span class="ss">Sinatra</span><span class="p">:</span><span class="ss">:Application</span>
+</span><span class='line'>    <span class="vc">@@game</span> <span class="o">=</span> <span class="no">PlayGame</span><span class="o">.</span><span class="n">new</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="c1">#routes</span>
 </span><span class='line'>    <span class="n">get</span> <span class="s1">&#39;/&#39;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="vc">@@game</span> <span class="o">=</span> <span class="no">PlayGame</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>      <span class="vi">@game</span> <span class="o">=</span> <span class="vc">@@game</span>
 </span><span class='line'>      <span class="n">erb</span> <span class="ss">:index</span>
 </span><span class='line'>    <span class="k">end</span>
 </span><span class='line'>
