@@ -4,7 +4,7 @@
   <title><![CDATA[Blog Title]]></title>
   <link href="http://amyrjohnson.github.io/atom.xml" rel="self"/>
   <link href="http://amyrjohnson.github.io/"/>
-  <updated>2014-07-28T22:47:25-04:00</updated>
+  <updated>2014-07-28T22:52:38-04:00</updated>
   <id>http://amyrjohnson.github.io/</id>
   <author>
     <name><![CDATA[Amy Johnson]]></name>
@@ -129,7 +129,7 @@
 
 <p>Once you have the data in the graph, Rickshaw has lots of options you can customize, from color palatte to annotations and hover detail. The syntax for these is pretty straightforward and can be found in the documentation and by looking at the example graphs provided on their website.</p>
 
-<p>The next interesting problem I faced was seeding the graph with some recent data before the page rendered so the user didn&rsquo;t have to wait for the graph to populate. I set up a database using Postgres and created a simple rake task to grab the realtime data, just like in my graph, but write it to the database instead of rendering it. That way a rolling log of data would be available to populate the graph.</p>
+<p>The next interesting problem I faced was seeding the graph with some recent data before the page rendered so the user didn&rsquo;t have to wait for the graph to populate. I set up a Postgres database and created a simple rake task to grab the realtime data, just like in my graph, but write it to the database instead of rendering it. That way a rolling log of data would be available to populate the graph.</p>
 
 <p>In order for the data to be current, the rake task needs to be run at regular intervals automatically, which is where the <a href="https://devcenter.heroku.com/articles/scheduler">Heroku scheduler add-on</a> comes in. This add-on is free and can be added to your existing heroku application using the command <code>$ heroku addons:add scheduler:standard</code>. Then, in your Heroku dashboard you can specify the rake task you want run and the interval, as often as every 10 minutes. Because I can&rsquo;t have the task run as often as my data source updates, I added code to interpolate between the most recent points to make the graph smoother.</p>
 ]]></content>
