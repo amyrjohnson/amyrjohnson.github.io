@@ -181,7 +181,11 @@
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>=&gt; Getting pictures took 14.296446
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ i.complete_search(10, 10)
+</span><span class='line'>
+</span><span class='line'>=&gt; Getting pictures took 14.296446
 </span><span class='line'>resizing pictures took 0.054123
 </span><span class='line'>getting picture colors took 0.007894
 </span><span class='line'>search took 14.361774</span></code></pre></td></tr></table></div></figure>
@@ -262,20 +266,31 @@
 
 <p>Now let&rsquo;s check our performance:</p>
 
-<p>&#8220;
-$ i.make_mosaic(50, 50, 10, 10)</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ i.make_mosaic(50, 50, 10, 10)
+</span><span class='line'>
+</span><span class='line'>=&gt; getting pixels took 0.959601
+</span><span class='line'>Getting pictures took 4.384112
+</span><span class='line'>resizing pictures took 0.055782
+</span><span class='line'>getting picture colors took 0.005212
+</span><span class='line'>search took 4.448468
+</span><span class='line'>matching pixels with image tiles took 0.087612
+</span><span class='line'>putting tiles in order took 0.089187
+</span><span class='line'>ordering photos took 0.007696
+</span><span class='line'>making mosaic took 0.290649
+</span><span class='line'>total time 5.883285</span></code></pre></td></tr></table></div></figure>
 
-<p>=> getting pixels took 0.959601
-Getting pictures took 4.384112
-resizing pictures took 0.055782
-getting picture colors took 0.005212
-search took 4.448468
-matching pixels with image tiles took 0.087612
-putting tiles in order took 0.089187
-ordering photos took 0.007696
-making mosaic took 0.290649
-total time 5.883285
-&#8220;`</p>
 
 <p>Dividing the work among multiple threads reduced the time the <code>get_pictures</code> function took from 14 seconds to 4 seconds. The whole mosaic operation now takes only 6 seconds, down from an original 69. However, this is still for only a small number of photo tiles. Larger mosaics with higher resolution tiles might require more performance improvements.</p>
 
