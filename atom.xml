@@ -4,7 +4,7 @@
   <title><![CDATA[Amy R. Johnson]]></title>
   <link href="http://amyrjohnson.github.io/atom.xml" rel="self"/>
   <link href="http://amyrjohnson.github.io/"/>
-  <updated>2014-08-10T17:47:28-04:00</updated>
+  <updated>2014-10-19T15:29:08-04:00</updated>
   <id>http://amyrjohnson.github.io/</id>
   <author>
     <name><![CDATA[Amy Johnson]]></name>
@@ -12,6 +12,322 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Troubleshooting performance in Ruby, Part 2]]></title>
+    <link href="http://amyrjohnson.github.io/blog/2014/10/19/troubleshooting-performance-in-ruby-part-2/"/>
+    <updated>2014-10-19T13:43:34-04:00</updated>
+    <id>http://amyrjohnson.github.io/blog/2014/10/19/troubleshooting-performance-in-ruby-part-2</id>
+    <content type="html"><![CDATA[<p>Once we knew what the source of the performance issues was, my mentor and I could begin optimizing. From our initial benchmarking, it was clear the <code>get_pictures</code> function needed some work. This is the function responsible for requesting photos with the given search term from Google&rsquo;s image search API, then downloading them and reading them into memory. Here&rsquo;s the function before optimization:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'> #takes 59.405176 seconds
+</span><span class='line'>
+</span><span class='line'>  def get_pictures
+</span><span class='line'>      @photo_tiles = ImageList.new
+</span><span class='line'>      limit = 50
+</span><span class='line'>      photos_per_query = 10
+</span><span class='line'>      api_key = API_KEY
+</span><span class='line'>      id = SEARCH_ENGINE_ID
+</span><span class='line'>      start = 1
+</span><span class='line'>      (1..limit).step(photos_per_query) { |start|
+</span><span class='line'>        source = "https://www.googleapis.com/customsearch/v1?q=#{search_term}&cx=#{id}&num=#{photos_per_query}&searchType=image&key=#{api_key}"
+</span><span class='line'>        data = JSON.load(open(source))
+</span><span class='line'>        (0...photos_per_query).each {|i|
+</span><span class='line'>            @photo_tiles.read(data["items"][i]["link"])
+</span><span class='line'>        }
+</span><span class='line'>      } rescue 'no more images found'
+</span><span class='line'>  end
+</span><span class='line'>
+</span><span class='line'>  </span></code></pre></td></tr></table></div></figure>
+
+
+<p>The first thing we noticed by browsing through the links Google returned was that some of these images were huge! Since the images are being resized to be used as small tiles in a photo mosaic, the extra time downloading larger images is completely wasted. One option to resolve this issue would be to check the size of the photo before downloading it, but thankfully Google provides size range parameters to restrict the result set to small or medium photos so no checks are necessary. Since we settled on a photo tile size of 10x10 pixels, even the thumbnails worked for our purposes.</p>
+
+<p>We also noticed as the function ran it would seem to get hung up on individual photos. Visiting those links sent us to non-responsive or slow pages. To combat that issue we added a rescue clause to the <code>read</code> statement, so the program would continue on in the case of a bad link.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>  def get_pictures
+</span><span class='line'>      @photo_tiles = ImageList.new
+</span><span class='line'>      limit = 50
+</span><span class='line'>      photos_per_query = 10
+</span><span class='line'>      api_key = API_KEY
+</span><span class='line'>      id = SEARCH_ENGINE_ID
+</span><span class='line'>      start = 1
+</span><span class='line'>      (1..limit).step(photos_per_query) { |start|
+</span><span class='line'>        source = "https://www.googleapis.com/customsearch/v1?q=#{search_term}&cx=#{id}&num=#{photos_per_query}&searchType=image&key=#{api_key}"
+</span><span class='line'>        data = JSON.load(open(source))
+</span><span class='line'>        (0...photos_per_query).each {|i|
+</span><span class='line'>            @photo_tiles.read(data["items"][i]["link"])
+</span><span class='line'>        }
+</span><span class='line'>      } rescue 'no more images found'
+</span><span class='line'>  end
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Running the whole search process with benchmarking now gives:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>=&gt; Getting pictures took 14.296446
+</span><span class='line'>resizing pictures took 0.054123
+</span><span class='line'>getting picture colors took 0.007894
+</span><span class='line'>search took 14.361774</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Simply changing the picture size and adding a rescue clause reduced the total time by 75%! However, this example is for a small number of total tiles. My mentor and I decided we could reduce the total time even further by adding more threads to the download process. That way, instead of waiting for each image to download completely before moving on to the next one, they can be downloaded concurrently. Since the download of one image doesn&rsquo;t depend on any other one, there&rsquo;s no need to download them one by one. Using more threads speeds up the amount of time the download portion takes.</p>
+
+<p>However, reading the images once they&rsquo;ve been downloaded has to be done one by one. In the original function the files are being downloaded and read in one line, so we need to separate the downloading from the reading in order to use threading.</p>
+
+<p>For each photo, we create a new thread (<code>Thread.new</code>) to open the image from a link and read it into a temporary file. Then, since all the images need to be finished downloading before we read them, the threads need to be joined using <code>thread.join</code>. Finally, we loop through the temporary files we created and read each one.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>def get_pictures
+</span><span class='line'>  @photo_tiles = ImageList.new
+</span><span class='line'>  limit = 50
+</span><span class='line'>  photos_per_query = 10
+</span><span class='line'>  api_key = API_KEY
+</span><span class='line'>  id = SEARCH_ENGINE_ID
+</span><span class='line'>  timeout_in_seconds = 1
+</span><span class='line'>  threads = []
+</span><span class='line'>  start = 1
+</span><span class='line'>  (1..limit).step(photos_per_query) { |start|
+</span><span class='line'>    source = "https://www.googleapis.com/customsearch/v1?q=#{self.search_term}&cx=#{id}&num=#{photos_per_query}&searchType=image&start=#{start}&key=#{api_key}&imageSize=Medium&fileType=jpg"
+</span><span class='line'>    data = JSON.load(open(source))
+</span><span class='line'>    (0...photos_per_query).each {|i|
+</span><span class='line'>        threads &lt;&lt; Thread.new { 
+</span><span class='line'>          open("tmp/image_#{start}_#{i}", 'wb') do |file|
+</span><span class='line'>            file &lt;&lt; open(data["items"][i]["image"]["thumbnailLink"]).read rescue puts 'Cannot read image'
+</span><span class='line'>          end
+</span><span class='line'>        }
+</span><span class='line'>        
+</span><span class='line'>    }
+</span><span class='line'>  } rescue 'no more images found'
+</span><span class='line'>
+</span><span class='line'>  threads.each do |t|
+</span><span class='line'>     t.join
+</span><span class='line'>  end
+</span><span class='line'>
+</span><span class='line'>  (1..limit).step(photos_per_query) do |start|
+</span><span class='line'>     (0...photos_per_query).each do |i|
+</span><span class='line'>        @photo_tiles.read("tmp/image_#{start}_#{i}") rescue puts 'Cannot read image'
+</span><span class='line'>     end
+</span><span class='line'>  end
+</span><span class='line'>end
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now let&rsquo;s check our performance:</p>
+
+<p>&#8220;
+$ i.make_mosaic(50, 50, 10, 10)</p>
+
+<p>=> getting pixels took 0.959601
+Getting pictures took 4.384112
+resizing pictures took 0.055782
+getting picture colors took 0.005212
+search took 4.448468
+matching pixels with image tiles took 0.087612
+putting tiles in order took 0.089187
+ordering photos took 0.007696
+making mosaic took 0.290649
+total time 5.883285
+&#8220;`</p>
+
+<p>Dividing the work among multiple threads reduced the time the <code>get_pictures</code> function took from 14 seconds to 4 seconds. The whole mosaic operation now takes only 6 seconds, down from an original 69. However, this is still for only a small number of photo tiles. Larger mosaics with higher resolution tiles might require more performance improvements.</p>
+
+<p>To learn more about threads in Ruby check out this <a href="http://www.sitepoint.com/threads-ruby/">tutorial</a> from Sitepoint.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Troubleshooting Performance in Ruby, Part 1]]></title>
+    <link href="http://amyrjohnson.github.io/blog/2014/09/19/troubleshooting-performance/"/>
+    <updated>2014-09-19T11:25:19-04:00</updated>
+    <id>http://amyrjohnson.github.io/blog/2014/09/19/troubleshooting-performance</id>
+    <content type="html"><![CDATA[<p>During my fellowship at Stack Exchange I&rsquo;ve been working on a photo mosaic application using Rails and RMagick, a wrapper on ImageMagick for Ruby. The application takes an uploaded image and a search term from the user and returns a mosaic of that image created from google image search results for the given term.</p>
+
+<p>The main issue I ran into when working on this application was how slow it ran. From start to finish the process of creating the mosaic took several minutes, even for a small number of photo tiles. My mentor at Stack Exchange helped me come up with several strategies to tackle this issue and speed up the application.</p>
+
+<p>The first step to improving the performance of the application was discovering exactly which processes were causing it to be slow. This would also provide a baseline performance metric to compare against once we implemented optimizations. In order to do this we added in some simple benchmarks. Before and after each process that was run, I printed out a system timestamp.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>def make_mosaic(photo_length, photo_width, tile_length, tile_width)
+</span><span class='line'>    time1 = Time.now
+</span><span class='line'>    self.get_pixels(photo_length, photo_width)
+</span><span class='line'>    time2 = Time.now
+</span><span class='line'>    puts "getting pixels took #{time2 - time1}"
+</span><span class='line'>    s = Search.new(self.search)
+</span><span class='line'>    s.complete_search(tile_length, tile_width)
+</span><span class='line'>    time3 = Time.now
+</span><span class='line'>    puts "completing search took #{time3 - time2}"
+</span><span class='line'>    self.match_pixels(s.photo_tile_colors)
+</span><span class='line'>    time4 = Time.now
+</span><span class='line'>    puts "matching pixels with image tiles took #{time4 - time3}"
+</span><span class='line'>    self.order_tiles(s.resized_photo_tiles)
+</span><span class='line'>    time5 = Time.now
+</span><span class='line'>    puts "putting tiles in order took #{time5 - time4}"
+</span><span class='line'>    m = Mosaic.new
+</span><span class='line'>    puts "ordering photos for mosaic"
+</span><span class='line'>    photos = m.order_photos(self.ordered_tiles, self.rows, self.cols, tile_length, tile_width)
+</span><span class='line'>    puts "making mosaic"
+</span><span class='line'>    m.create_mosaic(photos)
+</span><span class='line'>    puts "making mosaic took #{Time.now - time5}"
+</span><span class='line'>    puts "total time: #{Time.now - time}""
+</span><span class='line'>end 
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Although writing out the <code>puts</code> statements was time consuming, it gave me great readable output:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>=&gt; getting pixels took 0.983399
+</span><span class='line'>search took 71.075624
+</span><span class='line'>matching pixels with image tiles took 0.134034
+</span><span class='line'>putting tiles in order took 0.16947
+</span><span class='line'>ordering photos took 0.046765
+</span><span class='line'>making mosaic took 0.202503
+</span><span class='line'>total time 72.611871
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Initially I&rsquo;d thought that assembling the photos into a mosaic has been taking the longest amount of time, but from this initial output, I was able to pinpoint the source of the delay to the photo search function. From there I put further benchmarks into the search function to get more information.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>def complete_search(tile_length, tile_width)
+</span><span class='line'>  time = Time.now
+</span><span class='line'>  self.get_pictures
+</span><span class='line'>  time2 = Time.now
+</span><span class='line'>  puts "Getting pictures took #{time2 - time}"
+</span><span class='line'>  self.resize_pictures(tile_length, tile_width)
+</span><span class='line'>  time3 = Time.now
+</span><span class='line'>  puts  "resizing pictures took #{time3 - time2}"
+</span><span class='line'>  self.average_color_list
+</span><span class='line'>  time4 = Time.now 
+</span><span class='line'>  puts "getting picture colors took #{time4 - time3}"
+</span><span class='line'>
+</span><span class='line'>end
+</span><span class='line'>
+</span><span class='line'>=&gt; Getting pictures took 59.405176
+</span><span class='line'>resizing pictures took 9.876595
+</span><span class='line'>getting picture colors took 0.031038
+</span><span class='line'>search took 69.316089
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>By far the slowest operation was downloading the photos and reading them into memory. This was taking 59 seconds out of a total 72 seconds! Now that I had a clear idea of how long the process was taking and which part was the bottleneck, I could begin to optimize. In part two of this post, I&rsquo;ll show you my next steps.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Creating a realtime graph with Rickshaw and Heroku Scheduler]]></title>
